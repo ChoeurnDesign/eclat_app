@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "18381925114",
+    "project_id":  "e-commerce-store-1d35c",
+    "storage_bucket": "e-commerce-store-1d35c.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:18381925114:android: bdac872e3a5d9f48c43743",
+        "android_client_info":  {
+          "package_name":  "com.eclat.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCaAO9_-27Xq47GAl7QmPcA28k6I5l7suI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client":  []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
