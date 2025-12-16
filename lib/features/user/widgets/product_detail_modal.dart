@@ -23,6 +23,11 @@ class _ProductDetailModalState extends State<ProductDetailModal> {
   final _reviewService = ReviewService();
 
   void _addToCart(BuildContext context) {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      Navigator.pushReplacementNamed(context, '/login');
+      return;
+    }
     final cartService = Provider.of<CartService>(context, listen: false);
     cartService.addToCart(widget.product);
     Navigator.pop(context);
@@ -79,7 +84,7 @@ class _ProductDetailModalState extends State<ProductDetailModal> {
 
   @override
   Widget build(BuildContext context) {
-    final borderGray = Colors.grey[600]!; // For wishlist outline
+    final borderGray = Colors.grey[600]!;
     final p = widget.product;
 
     return Container(
@@ -132,10 +137,8 @@ class _ProductDetailModalState extends State<ProductDetailModal> {
                     ),
                   ),
                   const SizedBox(height: 24),
-                  // Name
                   Text(p.name, style: const TextStyle(fontSize: 28, fontWeight: FontWeight.w600, color: Color(0xFF2C3E50))),
                   const SizedBox(height: 12),
-                  // --- Row: Price LEFT, category RIGHT
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -166,7 +169,6 @@ class _ProductDetailModalState extends State<ProductDetailModal> {
                     ],
                   ),
                   const SizedBox(height: 12),
-                  // Stock
                   Row(
                     children: [
                       Icon(
@@ -186,7 +188,6 @@ class _ProductDetailModalState extends State<ProductDetailModal> {
                     ],
                   ),
                   const SizedBox(height: 24),
-                  // Description
                   const Text(
                     'Description',
                     style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Color(0xFF2C3E50)),
@@ -197,7 +198,6 @@ class _ProductDetailModalState extends State<ProductDetailModal> {
                     style: const TextStyle(fontSize: 15, color: Color(0xFF6B7280)),
                   ),
                   const SizedBox(height: 24),
-                  // --- Reviews Last ---
                   FutureBuilder<String?>(
                     future: _getCurrentUserId(),
                     builder: (context, userIdSnapshot) {
@@ -252,7 +252,7 @@ class _ProductDetailModalState extends State<ProductDetailModal> {
               ),
             ),
           ),
-          // --- Actions bar ---
+          // Bottom actions bar with auth check
           Container(
             padding: const EdgeInsets.fromLTRB(20, 16, 20, 16),
             decoration: const BoxDecoration(
@@ -273,7 +273,14 @@ class _ProductDetailModalState extends State<ProductDetailModal> {
                       final isInWishlist = wishlistService.isInWishlist(p.id);
                       return CupertinoButton(
                         padding: EdgeInsets.zero,
-                        onPressed: () => wishlistService.toggleWishlist(p),
+                        onPressed: () {
+                          final user = FirebaseAuth.instance.currentUser;
+                          if (user == null) {
+                            Navigator.pushReplacementNamed(context, '/login');
+                            return;
+                          }
+                          wishlistService.toggleWishlist(p);
+                        },
                         child: Container(
                           width: 52,
                           height: 52,
@@ -295,7 +302,9 @@ class _ProductDetailModalState extends State<ProductDetailModal> {
                   Expanded(
                     child: CupertinoButton(
                       padding: EdgeInsets.zero,
-                      onPressed: p.stock > 0 ? () => _addToCart(context) : null,
+                      onPressed: p.stock > 0
+                          ? () => _addToCart(context)
+                          : null,
                       child: Container(
                         height: 52,
                         decoration: BoxDecoration(

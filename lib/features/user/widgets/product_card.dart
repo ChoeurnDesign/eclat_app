@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:provider/provider.dart';
 import '../../../data/models/product_model.dart';
 import '../../../data/services/cart_service.dart';
@@ -9,11 +10,11 @@ class ProductCard extends StatefulWidget {
   final String name;
   final String price;
   final String imageUrl;
-  final Product?   product;
+  final Product? product;
 
   const ProductCard({
     super.key,
-    required this.   name,
+    required this.name,
     required this.price,
     required this.imageUrl,
     this.product,
@@ -35,12 +36,18 @@ class _ProductCardState extends State<ProductCard> {
     );
   }
 
-  // ✅ iOS-Style Alert Dialog with White Text
   void _addToCart() {
     if (widget.product == null) return;
 
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      // FIXED: Changed from pushReplacementNamed to pushNamed
+      Navigator.pushNamed(context, '/login');
+      return;
+    }
+
     final cartService = Provider.of<CartService>(context, listen: false);
-    cartService.addToCart(widget.   product!);
+    cartService.addToCart(widget.product!);
 
     showCupertinoDialog(
       context: context,
@@ -50,18 +57,18 @@ class _ProductCardState extends State<ProductCard> {
           style: TextStyle(
             fontSize: 17,
             fontWeight: FontWeight.w600,
-            color: CupertinoColors.white, // ✅ White text
+            color: CupertinoColors.white,
             letterSpacing: 0.5,
           ),
         ),
-        content:   Padding(
+        content: Padding(
           padding: const EdgeInsets.only(top: 8),
           child: Text(
             '${widget.name} has been added to your cart!',
             style: const TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.w400,
-              color: CupertinoColors.white, // ✅ White text
+              color: CupertinoColors.white,
               height: 1.4,
               letterSpacing: 0.3,
             ),
@@ -69,29 +76,29 @@ class _ProductCardState extends State<ProductCard> {
         ),
         actions: [
           CupertinoDialogAction(
-            onPressed:  () => Navigator.pop(context),
+            onPressed: () => Navigator.pop(context),
             child: const Text(
               'Continue Shopping',
               style: TextStyle(
                 fontSize: 17,
                 fontWeight: FontWeight.w400,
-                color: Color(0xFF007AFF), // ✅ iOS blue
+                color: Color(0xFF007AFF),
                 letterSpacing: 0.2,
               ),
             ),
           ),
           CupertinoDialogAction(
             isDefaultAction: true,
-            onPressed:  () {
+            onPressed: () {
               Navigator.pop(context);
               Navigator.pushNamed(context, '/cart');
             },
-            child:   const Text(
+            child: const Text(
               'View Cart',
               style: TextStyle(
                 fontSize: 17,
-                fontWeight: FontWeight. w600,
-                color: Color(0xFF007AFF), // ✅ iOS blue
+                fontWeight: FontWeight.w600,
+                color: Color(0xFF007AFF),
                 letterSpacing: 0.2,
               ),
             ),
@@ -104,7 +111,14 @@ class _ProductCardState extends State<ProductCard> {
   void _toggleWishlist() {
     if (widget.product == null) return;
 
-    final wishlistService = Provider.of<WishlistService>(context, listen:  false);
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      // FIXED: Changed from pushReplacementNamed to pushNamed
+      Navigator.pushNamed(context, '/login');
+      return;
+    }
+
+    final wishlistService = Provider.of<WishlistService>(context, listen: false);
     wishlistService.toggleWishlist(widget.product!);
   }
 
@@ -115,27 +129,25 @@ class _ProductCardState extends State<ProductCard> {
       onExit: (_) => setState(() => _isHovered = false),
       cursor: SystemMouseCursors.click,
       child: GestureDetector(
-        onTap:  _viewProductDetails,
+        onTap: _viewProductDetails,
         child: Container(
           decoration: BoxDecoration(
             color: CupertinoColors.white,
             borderRadius: BorderRadius.circular(8),
             boxShadow: [
               BoxShadow(
-                color: const Color(0xFF000000).withValues(alpha: _isHovered ? 0.15 : 0.08),
+                color: Color(_isHovered ? 0x26000000 : 0x14000000), // 0x26=0.15, 0x14=0.08
                 blurRadius: _isHovered ? 16 : 8,
-                offset:    Offset(0, _isHovered ? 6 : 3),
+                offset: Offset(0, _isHovered ? 6 : 3),
               ),
             ],
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Product Image
               Expanded(
                 child: Stack(
                   children: [
-                    // Image
                     ClipRRect(
                       borderRadius: const BorderRadius.vertical(top: Radius.circular(8)),
                       child: Image.network(
@@ -151,15 +163,13 @@ class _ProductCardState extends State<ProductCard> {
                         ),
                       ),
                     ),
-
-                    // Wishlist Button
                     if (widget.product != null)
                       Positioned(
                         top: 12,
                         right: 12,
                         child: Consumer<WishlistService>(
                           builder: (context, wishlistService, child) {
-                            final isInWishlist = wishlistService.  isInWishlist(widget.   product!.  id);
+                            final isInWishlist = wishlistService.isInWishlist(widget.product!.id);
                             return MouseRegion(
                               cursor: SystemMouseCursors.click,
                               child: GestureDetector(
@@ -167,13 +177,13 @@ class _ProductCardState extends State<ProductCard> {
                                 child: Container(
                                   padding: const EdgeInsets.all(10),
                                   decoration: BoxDecoration(
-                                    color: CupertinoColors.white.  withValues(alpha: 0.95),
+                                    color: const Color(0xF2FFFFFF), // 0xF2 is alpha~0.95
                                     shape: BoxShape.circle,
                                     boxShadow: [
                                       BoxShadow(
-                                        color: const Color(0xFF000000).withValues(alpha: 0.15),
+                                        color: const Color(0x26000000),
                                         blurRadius: 8,
-                                        offset:  const Offset(0, 2),
+                                        offset: const Offset(0, 2),
                                       ),
                                     ],
                                   ),
@@ -191,12 +201,10 @@ class _ProductCardState extends State<ProductCard> {
                   ],
                 ),
               ),
-
-              // Product Info
               Padding(
                 padding: const EdgeInsets.all(12),
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment. start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
                       widget.name,
@@ -204,14 +212,14 @@ class _ProductCardState extends State<ProductCard> {
                         fontSize: 14,
                         fontWeight: FontWeight.w500,
                         color: Color(0xFF2C3E50),
-                        letterSpacing: 0.2, // ✅ Professional spacing
+                        letterSpacing: 0.2,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
                     const SizedBox(height: 8),
                     Row(
-                      mainAxisAlignment:   MainAxisAlignment.  spaceBetween,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
                           widget.price,
@@ -219,22 +227,21 @@ class _ProductCardState extends State<ProductCard> {
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
                             color: Color(0xFF8A9A5B),
-                            letterSpacing: 0.3, // ✅ Professional spacing
+                            letterSpacing: 0.3,
                           ),
                         ),
-                        // Add to Cart Icon Button
                         MouseRegion(
                           cursor: SystemMouseCursors.click,
                           child: GestureDetector(
                             onTap: _addToCart,
                             child: Container(
-                              padding:  const EdgeInsets.all(10),
+                              padding: const EdgeInsets.all(10),
                               decoration: BoxDecoration(
-                                color:  const Color(0xFF8A9A5B).withValues(alpha: 0.15),
+                                color: const Color(0x268A9A5B), // 0x26 = 15% opacity
                                 shape: BoxShape.circle,
                               ),
                               child: const Icon(
-                                CupertinoIcons.  cart_badge_plus,
+                                CupertinoIcons.cart_badge_plus,
                                 size: 22,
                                 color: Color(0xFF8A9A5B),
                               ),

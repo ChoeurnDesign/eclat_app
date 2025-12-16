@@ -1,12 +1,17 @@
 import 'package:flutter/cupertino.dart';
-// import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../../data/models/product_model.dart';
+import 'package:flutter/material.dart';
 import '../../../data/services/product_service.dart';
 import 'product_card.dart';
 import 'home_footer.dart';
 
 class HomeBody extends StatefulWidget {
-  const HomeBody({super.key});
+  final Function(double)? onScrollUpdate;
+
+  const HomeBody({
+    super.key,
+    this.onScrollUpdate,
+  });
 
   @override
   State<HomeBody> createState() => _HomeBodyState();
@@ -18,10 +23,30 @@ class _HomeBodyState extends State<HomeBody> {
   List<Product> _products = [];
   bool _isLoading = true;
 
+  final ScrollController _scrollController = ScrollController();
+  double _scrollOffset = 0.0;
+
   @override
   void initState() {
     super.initState();
     _loadProducts();
+
+    _scrollController.addListener(() {
+      final newOffset = _scrollController.offset;
+      if (newOffset != _scrollOffset) {
+        setState(() {
+          _scrollOffset = newOffset;
+        });
+
+        widget.onScrollUpdate?.call(newOffset);
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
   }
 
   Future<void> _loadProducts() async {
@@ -43,57 +68,99 @@ class _HomeBodyState extends State<HomeBody> {
       return _products;
     }
     return _products
-        .where((product) => product.category. toUpperCase() == _selectedCategory)
+        .where((product) => product.category.toUpperCase() == _selectedCategory)
         .toList();
+  }
+
+  double get _bannerTextOpacity {
+    return 1.0 - (_scrollOffset / 180).clamp(0, 1);
+  }
+
+  double get _bannerTextScale {
+    return 1.0 - (_scrollOffset / 200).clamp(0, 0.6);
   }
 
   @override
   Widget build(BuildContext context) {
     return CustomScrollView(
+      controller: _scrollController,
       slivers: [
-        // Hero Section
         SliverToBoxAdapter(
           child: Container(
             height: 300,
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  Color(0xFF8A9A5B),
-                  Color(0xFF2C3E50),
-                ],
-              ),
-            ),
-            child: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Text(
-                    'ÉCLAT',
-                    style: TextStyle(
-                      fontSize: 48,
-                      fontWeight: FontWeight.w300,
-                      letterSpacing: 8,
-                      color: Color(0xFFF8F5F0),
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
+            child: Stack(
+              children: [
+                // BANNER IMAGE - REPLACED GRADIENT
+                Image.asset(
+                  'assets/images/banner.jpg', // Your banner image path
+                  width: double.infinity,
+                  height: 300,
+                  fit: BoxFit.cover, // Covers the entire area
+                  errorBuilder: (context, error, stackTrace) {
+                    // Fallback to gradient if image doesn't exist
+                    return Container(
+                      height: 300,
+                      decoration: const BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          colors: [
+                            Color(0xFF8A9A5B),
+                            Color(0xFF2C3E50),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                ),
+
+                // DARK OVERLAY FOR BETTER TEXT READABILITY
+                Container(
+                  height: 300,
+                  color: Colors.black.withOpacity(0.2), // Semi-transparent overlay
+                ),
+
+                // Curated Luxury Collection - Now BELOW ÉCLAT
+                Positioned(
+                  left: 24,
+                  bottom: 80,
+                  child: Text(
                     'Curated Luxury Collection',
                     style: TextStyle(
                       fontSize: 14,
                       letterSpacing: 2,
-                      color: const Color(0xFFF8F5F0).withValues(alpha: 0.8),  // ✅ Fixed
+                      color: const Color(0xFFF8F5F0).withOpacity(0.9), // Brighter for image
                     ),
                   ),
-                ],
-              ),
+                ),
+
+                // ÉCLAT Text - NOW ABOVE Curated Luxury Collection
+                Positioned(
+                  left: 24,
+                  bottom: 120,
+                  child: AnimatedOpacity(
+                    opacity: _bannerTextOpacity,
+                    duration: Duration.zero,
+                    child: Transform.scale(
+                      scale: _bannerTextScale,
+                      child: const Text(
+                        'ÉCLAT',
+                        style: TextStyle(
+                          fontSize: 48,
+                          fontWeight: FontWeight.w300,
+                          letterSpacing: 8,
+                          color: Color(0xFFF8F5F0), // White text
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
         ),
 
-        // ✅ Category Filter Buttons - FINAL FIX FOR SCROLLBAR POSITION
+        // Rest of your code remains exactly the same...
         SliverToBoxAdapter(
           child: Container(
             color: const Color(0xFFF8F5F0),
@@ -101,33 +168,25 @@ class _HomeBodyState extends State<HomeBody> {
             child: SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               padding: const EdgeInsets.symmetric(horizontal: 24),
-              child: Column( // Wrapped Row in a Column
-                crossAxisAlignment: CrossAxisAlignment.start,
+              child: Row(
                 children: [
-                  Row( // The original Row containing buttons
-                    children: [
-                      _buildCategoryButton('ALL'),
-                      const SizedBox(width: 16),
-                      _buildCategoryButton('ACCESSORIES'),
-                      const SizedBox(width: 16),
-                      _buildCategoryButton('BAGS'),
-                      const SizedBox(width: 16),
-                      _buildCategoryButton('CLOTHING'),
-                      const SizedBox(width: 16),
-                      _buildCategoryButton('JEWELRY'),
-                      const SizedBox(width: 16),
-                      _buildCategoryButton('WATCHES'),
-                    ],
-                  ),
-                  // *** CRUCIAL FIX: Explicit height for scrollbar space ***
-                  const SizedBox(height: 12),
+                  _buildCategoryButton('ALL'),
+                  const SizedBox(width: 16),
+                  _buildCategoryButton('ACCESSORIES'),
+                  const SizedBox(width: 16),
+                  _buildCategoryButton('BAGS'),
+                  const SizedBox(width: 16),
+                  _buildCategoryButton('CLOTHING'),
+                  const SizedBox(width: 16),
+                  _buildCategoryButton('JEWELRY'),
+                  const SizedBox(width: 16),
+                  _buildCategoryButton('WATCHES'),
                 ],
               ),
             ),
           ),
         ),
 
-        // ✅ Section Title - STAYS BELOW CATEGORIES
         SliverToBoxAdapter(
           child: Container(
             color: const Color(0xFFF8F5F0),
@@ -155,18 +214,17 @@ class _HomeBodyState extends State<HomeBody> {
           ),
         ),
 
-        // Loading or Product Grid
         _isLoading
             ? const SliverToBoxAdapter(
           child: Center(
-            child:  Padding(
+            child: Padding(
               padding: EdgeInsets.all(40),
               child: CupertinoActivityIndicator(),
             ),
           ),
         )
             : _filteredProducts.isEmpty
-            ?  SliverToBoxAdapter(
+            ? SliverToBoxAdapter(
           child: Center(
             child: Padding(
               padding: const EdgeInsets.all(40),
@@ -182,7 +240,7 @@ class _HomeBodyState extends State<HomeBody> {
                     _selectedCategory == 'ALL'
                         ? 'No products available'
                         : 'No products in $_selectedCategory',
-                    style:  const TextStyle(
+                    style: const TextStyle(
                       fontSize: 16,
                       color: Color(0xFF6B7280),
                     ),
@@ -193,9 +251,10 @@ class _HomeBodyState extends State<HomeBody> {
           ),
         )
             : SliverPadding(
-          padding:  const EdgeInsets.symmetric(horizontal: 16),
+          padding: const EdgeInsets.symmetric(horizontal: 16),
           sliver: SliverGrid(
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            gridDelegate:
+            const SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 2,
               childAspectRatio: 0.75,
               crossAxisSpacing: 16,
@@ -205,9 +264,11 @@ class _HomeBodyState extends State<HomeBody> {
                   (context, index) {
                 final product = _filteredProducts[index];
                 return ProductCard(
-                  name: product.name,
-                  price: '\$${product.price.toStringAsFixed(2)}',
-                  imageUrl: product.imageUrl,
+                  name: product.name ?? "No name",
+                  price: product.price != null
+                      ? '\$${product.price!.toStringAsFixed(2)}'
+                      : "-",
+                  imageUrl: product.imageUrl ?? "",
                   product: product,
                 );
               },
@@ -216,12 +277,9 @@ class _HomeBodyState extends State<HomeBody> {
           ),
         ),
 
-        // Spacing before footer
         const SliverToBoxAdapter(
           child: SizedBox(height: 48),
         ),
-
-        // Footer
         const SliverToBoxAdapter(
           child: HomeFooter(),
         ),
@@ -231,7 +289,6 @@ class _HomeBodyState extends State<HomeBody> {
 
   Widget _buildCategoryButton(String category) {
     final isSelected = _selectedCategory == category;
-
     return MouseRegion(
       cursor: SystemMouseCursors.click,
       child: GestureDetector(
@@ -240,11 +297,11 @@ class _HomeBodyState extends State<HomeBody> {
             _selectedCategory = category;
           });
         },
-        child:  Container(
+        child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
           decoration: BoxDecoration(
-            color: isSelected ?  const Color(0xFF8A9A5B) : const Color(0xFFF5F3F0),
-            borderRadius:  BorderRadius.circular(20),
+            color: isSelected ? const Color(0xFF8A9A5B) : const Color(0xFFF5F3F0),
+            borderRadius: BorderRadius.circular(20),
             border: Border.all(
               color: isSelected ? const Color(0xFF8A9A5B) : const Color(0xFFD1C4B0),
               width: 1,
@@ -256,7 +313,7 @@ class _HomeBodyState extends State<HomeBody> {
               fontSize: 12,
               fontWeight: FontWeight.w600,
               letterSpacing: 1.5,
-              color: isSelected ?  const Color(0xFFF8F5F0) : const Color(0xFF666666),
+              color: isSelected ? const Color(0xFFF8F5F0) : const Color(0xFF666666),
             ),
           ),
         ),

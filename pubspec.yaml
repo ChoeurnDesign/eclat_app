@@ -1,10 +1,10 @@
-﻿name: eclat_app
+name: eclat_app
 description: Fashion Store
 publish_to: 'none'
 version: 1.0.0+1
 
 environment:
-  sdk:  ">=3.0.0 <4.0.0"
+  sdk: ">=3.0.0 <4.0.0"
 
 dependencies:
   flutter:
@@ -12,7 +12,7 @@ dependencies:
   cupertino_icons: ^1.0.6
   firebase_core: ^3.6.0
   firebase_auth: ^5.3.1
-  cloud_firestore:  ^5.4.4
+  cloud_firestore: ^5.4.4
   provider: ^6.1.2
   shared_preferences: ^2.0.18
   uuid: ^3.0.7
@@ -25,3 +25,8 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+
+  # ✅ CORRECT: assets should be under flutter section
+  assets:
+    - assets/images/logo.png
+    - assets/images/banner.jpg
