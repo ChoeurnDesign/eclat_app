@@ -15,6 +15,7 @@ import '../../features/admin/screens/admin_dashboard_screen.dart';
 import '../../features/admin/screens/admin_products_screen.dart';
 import '../../features/admin/screens/admin_users_screen.dart';
 import '../../features/admin/screens/admin_add_edit_product_screen.dart';
+import '../../features/admin/screens/admin_analytics_screen.dart';
 import '../../data/models/product_model.dart';
 
 class AppRoutes {
@@ -33,7 +34,7 @@ class AppRoutes {
   static const String settings = '/settings';
   static const String help = '/help';
   static const String about = '/about';
-  static const String contact = '/contact'; // ✅ Added
+  static const String contact = '/contact';
   static const String checkout = '/checkout';
 
   // Admin Routes
@@ -42,6 +43,7 @@ class AppRoutes {
   static const String adminProducts = '/admin/products';
   static const String adminAddProduct = '/admin/products/add';
   static const String adminEditProduct = '/admin/products/edit';
+  static const String adminAnalytics = '/admin/analytics'; // ✅ ADDED
 
   static Map<String, WidgetBuilder> get routes => {
     // Auth
@@ -57,7 +59,7 @@ class AppRoutes {
     settings: (context) => const SettingsScreen(),
     help: (context) => const HelpScreen(),
     about: (context) => const AboutScreen(),
-    contact: (context) => const ContactScreen(), // ✅ Added
+    contact: (context) => const ContactScreen(),
     checkout: (context) => const CheckoutScreen(),
 
     // Admin
@@ -65,12 +67,13 @@ class AppRoutes {
     adminUsers: (context) => const AdminUsersScreen(),
     adminProducts:  (context) => const AdminProductsScreen(),
     adminAddProduct:  (context) => const AdminAddEditProductScreen(),
+    adminAnalytics: (context) => const AdminAnalyticsScreen(), // ✅ ADDED
   };
 
   static Route<dynamic>? onGenerateRoute(RouteSettings settings) {
     switch (settings.name) {
       case adminEditProduct:
-        final product = settings.arguments as Product? ;
+        final product = settings.arguments as Product?;
         return CupertinoPageRoute(
           builder: (context) => AdminAddEditProductScreen(product: product),
           settings: settings,
@@ -92,13 +95,13 @@ class AppRoutes {
     }
   }
 
-  static Widget _buildErrorPage(String?  routeName) {
+  static Widget _buildErrorPage(String? routeName) {
     return CupertinoPageScaffold(
       navigationBar: const CupertinoNavigationBar(
         middle: Text('Error'),
       ),
       child: Center(
-        child:  Padding(
+        child: Padding(
           padding: const EdgeInsets.all(24),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -117,11 +120,11 @@ class AppRoutes {
                   letterSpacing: 0.3,
                 ),
               ),
-              const SizedBox(height:  8),
+              const SizedBox(height: 8),
               Text(
                 'Route: ${routeName ?? "unknown"}',
                 style: const TextStyle(
-                  fontSize:  14,
+                  fontSize: 14,
                   color: CupertinoColors.systemGrey,
                   letterSpacing: 0.2,
                 ),
@@ -149,7 +152,7 @@ class AppRoutes {
     Navigator.pushNamed(context, checkout);
   }
 
-  static void navigateToContact(BuildContext context) { // ✅ Added
+  static void navigateToContact(BuildContext context) {
     Navigator.pushNamed(context, contact);
   }
 
@@ -159,5 +162,10 @@ class AppRoutes {
       adminEditProduct,
       arguments: product,
     );
+  }
+
+  // ✅ Add this shortcut if you want:
+  static void navigateToAdminAnalytics(BuildContext context) {
+    Navigator.pushNamed(context, adminAnalytics);
   }
 }

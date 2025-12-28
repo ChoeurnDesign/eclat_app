@@ -192,29 +192,29 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
 
                 // Quick Actions
                 SliverToBoxAdapter(
-                  child:  Padding(
-                    padding:  const EdgeInsets.all(16),
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         const Text(
                           'QUICK ACTIONS',
                           style: TextStyle(
-                            fontSize:  12,
+                            fontSize: 12,
                             fontWeight: FontWeight.w500,
-                            letterSpacing:  3,
+                            letterSpacing: 3,
                             color: Color(0xFF8A9A5B),
                           ),
                         ),
                         const SizedBox(height: 16),
                         _ActionButton(
-                          icon: CupertinoIcons. person_2,
+                          icon: CupertinoIcons.person_2,
                           title: 'Manage Users',
                           subtitle: 'View and manage all users',
                           onTap: () {
                             Navigator.pushNamed(
                               context,
-                              '/admin/users',
+                              AppRoutes.adminUsers,
                             );
                           },
                         ),
@@ -222,21 +222,24 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                         _ActionButton(
                           icon: CupertinoIcons.cube_box,
                           title: 'Manage Products',
-                          subtitle:  'Add, edit, or remove products',
+                          subtitle: 'Add, edit, or remove products',
                           onTap: () {
                             Navigator.pushNamed(
                               context,
-                              '/admin/products',
+                              AppRoutes.adminProducts,
                             );
                           },
                         ),
                         const SizedBox(height: 12),
                         _ActionButton(
                           icon: CupertinoIcons.chart_bar,
-                          title:  'View Analytics',
+                          title: 'View Analytics',
                           subtitle: 'Sales and performance data',
-                          onTap:  () {
-                            // Navigate to analytics
+                          onTap: () {
+                            Navigator.pushNamed(
+                              context,
+                              AppRoutes.adminAnalytics,
+                            );
                           },
                         ),
                       ],
