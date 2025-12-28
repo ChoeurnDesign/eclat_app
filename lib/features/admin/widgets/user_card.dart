@@ -6,11 +6,11 @@ class UserCard extends StatelessWidget {
   final String email;
   final String displayName;
   final String role;
-  final VoidCallback?  onRoleChanged;
+  final VoidCallback? onRoleChanged;
 
   const UserCard({
     super.key,
-    required this. uid,
+    required this.uid,
     required this.email,
     required this.displayName,
     required this.role,
@@ -24,11 +24,12 @@ class UserCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: CupertinoColors.white,
         borderRadius: BorderRadius.circular(12),
-        boxShadow:  [
+        boxShadow: [
           BoxShadow(
-            color: const Color(0xFF000000).withValues(alpha: 0.05),
-            blurRadius: 10,
+            color: const Color(0xFF2C3E50).withOpacity(0.08), // Soft shadow
+            blurRadius: 8,
             offset: const Offset(0, 2),
+            spreadRadius: 0,
           ),
         ],
       ),
@@ -36,17 +37,21 @@ class UserCard extends StatelessWidget {
         children: [
           // Avatar
           Container(
-            width:  50,
+            width: 50,
             height: 50,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               color: role == 'admin'
-                  ? const Color(0xFF8A9A5B).withValues(alpha: 0.2)
-                  : const Color(0xFFC4A484).withValues(alpha: 0.2),
+                  ? const Color(0xFF8A9A5B).withValues(alpha: 51)
+                  : const Color(0xFFC4A484).withValues(alpha: 51),
             ),
             child: Icon(
-              role == 'admin' ? CupertinoIcons.shield_fill : CupertinoIcons.person_fill,
-              color: role == 'admin' ? const Color(0xFF8A9A5B) : const Color(0xFFC4A484),
+              role == 'admin'
+                  ? CupertinoIcons.shield_fill
+                  : CupertinoIcons.person_fill,
+              color: role == 'admin'
+                  ? const Color(0xFF8A9A5B)
+                  : const Color(0xFFC4A484),
               size: 24,
             ),
           ),
@@ -71,7 +76,7 @@ class UserCard extends StatelessWidget {
                 Text(
                   email,
                   style: const TextStyle(
-                    fontSize:  12,
+                    fontSize: 12,
                     color: Color(0xFF666666),
                   ),
                   maxLines: 1,
@@ -87,12 +92,12 @@ class UserCard extends StatelessWidget {
                     color: role == 'admin'
                         ? const Color(0xFF8A9A5B)
                         : const Color(0xFFC4A484),
-                    borderRadius: BorderRadius. circular(8),
+                    borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(
-                    role. toUpperCase(),
+                    role.toUpperCase(),
                     style: const TextStyle(
-                      fontSize:  10,
+                      fontSize: 10,
                       fontWeight: FontWeight.w600,
                       letterSpacing: 1,
                       color: CupertinoColors.white,
@@ -107,7 +112,7 @@ class UserCard extends StatelessWidget {
           CupertinoButton(
             padding: EdgeInsets.zero,
             onPressed: () => _showUserActions(context),
-            child:  const Icon(
+            child: const Icon(
               CupertinoIcons.ellipsis_vertical,
               color: Color(0xFF666666),
               size: 20,
@@ -122,22 +127,43 @@ class UserCard extends StatelessWidget {
     showCupertinoModalPopup(
       context: context,
       builder: (context) => CupertinoActionSheet(
-        title: Text(displayName),
-        message: Text(email),
+        title: Text(
+          displayName,
+          style: const TextStyle(
+            color: CupertinoColors.white,
+            fontWeight: FontWeight.bold,
+            fontSize: 17,
+          ),
+          textAlign: TextAlign.center,
+        ),
+        message: Text(
+          email,
+          style: const TextStyle(
+            color: CupertinoColors.white,
+            fontSize: 14,
+          ),
+          textAlign: TextAlign.center,
+        ),
         actions: [
           CupertinoActionSheetAction(
             onPressed: () {
-              Navigator. pop(context);
+              Navigator.pop(context);
               _showUserDetails(context);
             },
-            child: const Text('View Details'),
+            child: const Text(
+              'View Details',
+              style: TextStyle(color: CupertinoColors.white),
+            ),
           ),
           CupertinoActionSheetAction(
             onPressed: () {
               Navigator.pop(context);
               _toggleRole(context);
             },
-            child: Text(role == 'admin' ?  'Demote to User' : 'Promote to Admin'),
+            child: Text(
+              role == 'admin' ? 'Demote to User' : 'Promote to Admin',
+              style: const TextStyle(color: CupertinoColors.white),
+            ),
           ),
           CupertinoActionSheetAction(
             isDestructiveAction: true,
@@ -145,12 +171,18 @@ class UserCard extends StatelessWidget {
               Navigator.pop(context);
               _confirmDelete(context);
             },
-            child: const Text('Delete User'),
+            child: const Text(
+              'Delete User',
+              style: TextStyle(color: CupertinoColors.destructiveRed),
+            ),
           ),
         ],
         cancelButton: CupertinoActionSheetAction(
           onPressed: () => Navigator.pop(context),
-          child: const Text('Cancel'),
+          child: const Text(
+            'Cancel',
+            style: TextStyle(color: CupertinoColors.systemGrey),
+          ),
         ),
       ),
     );
@@ -160,24 +192,43 @@ class UserCard extends StatelessWidget {
     showCupertinoDialog(
       context: context,
       builder: (context) => CupertinoAlertDialog(
-        title: const Text('User Details'),
+        title: const Text(
+          'User Details',
+          style: TextStyle(color: CupertinoColors.white),
+        ),
         content: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
           children: [
             const SizedBox(height: 16),
-            Text('Name: $displayName'),
+            Text(
+              'Name: $displayName',
+              style: const TextStyle(color: CupertinoColors.white),
+            ),
             const SizedBox(height: 8),
-            Text('Email: $email'),
+            Text(
+              'Email: $email',
+              style: const TextStyle(color: CupertinoColors.white),
+            ),
             const SizedBox(height: 8),
-            Text('Role: ${role. toUpperCase()}'),
+            Text(
+              'Role: ${role.toUpperCase()}',
+              style: const TextStyle(color: CupertinoColors.white),
+            ),
             const SizedBox(height: 8),
-            Text('UID: $uid'),
+            Text(
+              'UID: $uid',
+              style: const TextStyle(color: CupertinoColors.white),
+            ),
           ],
         ),
         actions: [
           CupertinoDialogAction(
-            child: const Text('Close'),
             onPressed: () => Navigator.pop(context),
+            child: const Text(
+              'Close',
+              style: TextStyle(color: CupertinoColors.white),
+            ),
           ),
         ],
       ),
@@ -189,17 +240,20 @@ class UserCard extends StatelessWidget {
 
     showCupertinoDialog(
       context: context,
-      builder:  (context) => CupertinoAlertDialog(
-        title:  const Text('Change Role'),
-        content: Text('Change $displayName\'s role to ${newRole.toUpperCase()}?'),
+      builder: (context) => CupertinoAlertDialog(
+        title: const Text('Change Role', style: TextStyle(color: CupertinoColors.white)),
+        content: Text(
+          "Change $displayName's role to ${newRole.toUpperCase()}?",
+          style: const TextStyle(color: CupertinoColors.white),
+        ),
         actions: [
           CupertinoDialogAction(
-            child: const Text('Cancel'),
+            child: const Text('Cancel', style: TextStyle(color: CupertinoColors.white)),
             onPressed: () => Navigator.pop(context),
           ),
           CupertinoDialogAction(
             isDefaultAction: true,
-            child: const Text('Confirm'),
+            child: const Text('Confirm', style: TextStyle(color: CupertinoColors.activeGreen)),
             onPressed: () async {
               try {
                 await FirebaseFirestore.instance
@@ -214,11 +268,14 @@ class UserCard extends StatelessWidget {
                   showCupertinoDialog(
                     context: context,
                     builder: (context) => CupertinoAlertDialog(
-                      title: const Text('Success'),
-                      content: Text('User role changed to ${newRole.toUpperCase()}'),
+                      title: const Text('Success', style: TextStyle(color: CupertinoColors.white)),
+                      content: Text(
+                        'User role changed to ${newRole.toUpperCase()}',
+                        style: const TextStyle(color: CupertinoColors.white),
+                      ),
                       actions: [
                         CupertinoDialogAction(
-                          child: const Text('OK'),
+                          child: const Text('OK', style: TextStyle(color: CupertinoColors.white)),
                           onPressed: () => Navigator.pop(context),
                         ),
                       ],
@@ -226,17 +283,20 @@ class UserCard extends StatelessWidget {
                   );
                 }
               } catch (e) {
-                if (context. mounted) {
-                  Navigator. pop(context);
+                if (context.mounted) {
+                  Navigator.pop(context);
                   showCupertinoDialog(
                     context: context,
                     builder: (context) => CupertinoAlertDialog(
-                      title: const Text('Error'),
-                      content: Text('Failed to change role: $e'),
+                      title: const Text('Error', style: TextStyle(color: CupertinoColors.destructiveRed)),
+                      content: Text(
+                        'Failed to change role: $e',
+                        style: const TextStyle(color: CupertinoColors.white),
+                      ),
                       actions: [
                         CupertinoDialogAction(
-                          child: const Text('OK'),
-                          onPressed:  () => Navigator.pop(context),
+                          child: const Text('OK', style: TextStyle(color: CupertinoColors.white)),
+                          onPressed: () => Navigator.pop(context),
                         ),
                       ],
                     ),
@@ -254,22 +314,25 @@ class UserCard extends StatelessWidget {
     showCupertinoDialog(
       context: context,
       builder: (context) => CupertinoAlertDialog(
-        title: const Text('Delete User'),
-        content: Text('Are you sure you want to delete $displayName?  This action cannot be undone.'),
+        title: const Text('Delete User', style: TextStyle(color: CupertinoColors.destructiveRed)),
+        content: Text(
+          'Are you sure you want to delete $displayName? This action cannot be undone.',
+          style: const TextStyle(color: CupertinoColors.white),
+        ),
         actions: [
           CupertinoDialogAction(
-            child: const Text('Cancel'),
+            child: const Text('Cancel', style: TextStyle(color: CupertinoColors.white)),
             onPressed: () => Navigator.pop(context),
           ),
           CupertinoDialogAction(
             isDestructiveAction: true,
-            child: const Text('Delete'),
+            child: const Text('Delete', style: TextStyle(color: CupertinoColors.destructiveRed)),
             onPressed: () async {
               try {
                 await FirebaseFirestore.instance
-                    . collection('users')
-                    . doc(uid)
-                    . delete();
+                    .collection('users')
+                    .doc(uid)
+                    .delete();
 
                 if (context.mounted) {
                   Navigator.pop(context);
@@ -278,11 +341,11 @@ class UserCard extends StatelessWidget {
                   showCupertinoDialog(
                     context: context,
                     builder: (context) => CupertinoAlertDialog(
-                      title: const Text('Success'),
-                      content: const Text('User deleted successfully'),
+                      title: const Text('Success', style: TextStyle(color: CupertinoColors.activeGreen)),
+                      content: const Text('User deleted successfully', style: TextStyle(color: CupertinoColors.white)),
                       actions: [
                         CupertinoDialogAction(
-                          child: const Text('OK'),
+                          child: const Text('OK', style: TextStyle(color: CupertinoColors.white)),
                           onPressed: () => Navigator.pop(context),
                         ),
                       ],
@@ -290,17 +353,20 @@ class UserCard extends StatelessWidget {
                   );
                 }
               } catch (e) {
-                if (context. mounted) {
-                  Navigator. pop(context);
+                if (context.mounted) {
+                  Navigator.pop(context);
                   showCupertinoDialog(
                     context: context,
                     builder: (context) => CupertinoAlertDialog(
-                      title: const Text('Error'),
-                      content: Text('Failed to delete user: $e'),
+                      title: const Text('Error', style: TextStyle(color: CupertinoColors.destructiveRed)),
+                      content: Text(
+                        'Failed to delete user: $e',
+                        style: const TextStyle(color: CupertinoColors.white),
+                      ),
                       actions: [
                         CupertinoDialogAction(
-                          child: const Text('OK'),
-                          onPressed:  () => Navigator.pop(context),
+                          child: const Text('OK', style: TextStyle(color: CupertinoColors.white)),
+                          onPressed: () => Navigator.pop(context),
                         ),
                       ],
                     ),
